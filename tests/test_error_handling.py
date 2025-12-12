@@ -1,8 +1,9 @@
-import pytest
-from pathlib import Path
+from typing import Any
+
 from diagram_generator.adapters.input.yaml_loader import YAMLMetadataAdapter
 
-def test_load_components_with_errors(tmp_path):
+
+def test_load_components_with_errors(tmp_path: Any) -> None:
     # Create bad yaml
     bad_data = tmp_path / "components"
     bad_data.mkdir()

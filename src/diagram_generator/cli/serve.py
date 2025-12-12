@@ -3,6 +3,7 @@ import socketserver
 import subprocess
 import time
 from pathlib import Path
+from typing import Any
 
 import typer
 from rich.console import Console
@@ -15,12 +16,12 @@ def start(
     data_dir: Path = typer.Option(Path("./data"), help="Directory containing the metadata."), # noqa: B008
     output_dir: Path = typer.Option(Path("./dist"), help="Output directory."), # noqa: B008
     port: int = typer.Option(8000, help="Port to serve on."),
-):
+) -> None:
     """
     Starts a live preview server.
     """
     try:
-        from watchdog.events import FileSystemEventHandler  # noqa: PLC0415
+        from watchdog.events import FileSystemEvent, FileSystemEventHandler  # noqa: PLC0415
         from watchdog.observers import Observer  # noqa: PLC0415
     except ImportError:
         console.print("[red]Error: 'watchdog' package not installed.[/red]")
@@ -33,18 +34,23 @@ def start(
             self.output_dir = output_dir
             self.last_reload = 0
 
-        def on_any_event(self, event):
+        def on_modified(self, event: FileSystemEvent) -> None:
             if event.is_directory:
                 return
-            if not event.src_path.endswith('.yaml'):
+
+            src_path = event.src_path
+            if isinstance(src_path, bytes):
+                src_path = src_path.decode('utf-8')
+
+            if not src_path.endswith('.yaml'):
                 return
 
             # Debounce
             if time.time() - self.last_reload < 1:
                 return
             
-            self.last_reload = time.time()
-            console.print(f"[yellow]Change detected in {event.src_path}. Regenerating...[/yellow]")
+            self.last_reload = int(time.time())
+            console.print(f"[yellow]Change detected in {src_path}. Regenerating...[/yellow]")
             try:
                 # We call the main module to regenerate
                 # Using subprocess to avoid complex re-import logic for now
@@ -80,7 +86,7 @@ def start(
     # Start HTTP Server
     # We serve the output directory
     class Handler(http.server.SimpleHTTPRequestHandler):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
             super().__init__(*args, directory=str(output_dir), **kwargs)
 
     console.print(f"[green]Serving live preview at http://localhost:{port}[/green]")

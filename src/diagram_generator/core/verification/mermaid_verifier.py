@@ -1,20 +1,21 @@
 
 import re
-from typing import List, Dict, Tuple
-from diagram_generator.core.domain.flow import Flow, FlowStep
+
+from diagram_generator.core.domain.flow import Flow
+
 
 class VerificationResult:
-    def __init__(self, success: bool, errors: List[str]):
+    def __init__(self, success: bool, errors: list[str]):
         self.success = success
         self.errors = errors
 
 class MermaidVerifier:
-    def __init__(self):
+    def __init__(self) -> None:
         # Regex to capture Source, Arrow, Target, Description
         # Supports ->>, -->>, ->, -->
         self.flow_regex = re.compile(r"^\s*([a-zA-Z0-9_-]+)\s*(-{1,2}(?:>>|>))\s*([a-zA-Z0-9_-]+)\s*:\s*(.+)$")
 
-    def parse_mermaid(self, content: str) -> List[Dict[str, str]]:
+    def parse_mermaid(self, content: str) -> list[dict[str, str]]:
         """
         Parses Mermaid sequence diagram content into a list of steps.
         """
@@ -74,6 +75,8 @@ class MermaidVerifier:
                 parsed_idx += 1
             
             if not found:
-                errors.append(f"Missing or out-of-order step {step_idx + 1}: {flow_step.source_id} -> {flow_step.target_id} : {flow_step.description}")
+                errors.append(
+                    f"Step {step_idx + 1}: {flow_step.source_id} -> {flow_step.target_id} : {flow_step.description}"
+                )
         
         return VerificationResult(len(errors) == 0, errors)

@@ -1,5 +1,13 @@
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+import io
+from typing import Any
+
+from jinja2 import Environment, FileSystemLoader
+
+try:
+    from ruamel.yaml import YAML
+except ImportError:
+    YAML = None # type: ignore
 
 from diagram_generator.core.domain.component import Component
 from diagram_generator.core.domain.flow import Flow
@@ -17,10 +25,9 @@ class MermaidDiagramAdapter(DiagramPort):
             lstrip_blocks=True
         )
         
-        from ruamel.yaml import YAML
-        import io
-        
-        def to_yaml(value):
+        def to_yaml(value: Any) -> str:
+            if YAML is None:
+                return ""
             yaml = YAML(typ='safe')
             yaml.default_flow_style = False
             stream = io.StringIO()

@@ -4,8 +4,10 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
 from typing import Any
+
+from pydantic import BaseModel, Field
+
 
 class Relationship(BaseModel):
     source_id: str = Field(..., description='ID of the source component.')

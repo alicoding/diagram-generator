@@ -1,29 +1,41 @@
+import traceback
 from pathlib import Path
-from typing import List, Tuple, Any
+from typing import Any
 
-from lark import Lark, Visitor, Tree
+from lark import Lark, Tree, Visitor
 
-from diagram_generator.core.domain.relationship import Relationship
-from diagram_generator.core.domain.flow import Flow, FlowStep
+try:
+    from ruamel.yaml import YAML
+except ImportError:
+    YAML = None # type: ignore
 
 from diagram_generator.core.domain.component import (
-    Component, ComponentType, GenericComponent, 
-    Person, System, Container, Database, Service, WebUI, 
-    ExternalSystem, LegacySystem
+    Component,
+    ComponentType,
+    Container,
+    Database,
+    ExternalSystem,
+    GenericComponent,
+    LegacySystem,
+    Person,
+    Service,
+    System,
+    WebUI,
 )
+from diagram_generator.core.domain.flow import Flow, FlowStep
+from diagram_generator.core.domain.relationship import Relationship
 
 
-
-class DSLVisitor(Visitor):
+class DSLVisitor(Visitor[Any]):
     def __init__(self, flow_id: str):
         self.flow_id = flow_id
-        self.relationships: List[Relationship] = []
-        self.components: List[Component] = []
-        self.flow_steps: List[FlowStep] = []
+        self.relationships: list[Relationship] = []
+        self.components: list[Component] = []
+        self.flow_steps: list[FlowStep] = []
         self.current_group: str | None = None
         self.last_entity_id: str | None = None
 
-    def connection(self, tree: Tree):
+    def connection(self, tree: Tree[Any]) -> None:
         # Children: ID, arrow, ID, [description], [properties]
         args = tree.children
         
@@ -43,7 +55,7 @@ class DSLVisitor(Visitor):
         self.last_entity_id = target_id
         
         description = ""
-        properties = {}
+        properties: dict[str, Any] = {}
         
         # Iterate remaining args to find description/properties
         for arg in args[3:]:
@@ -58,6 +70,8 @@ class DSLVisitor(Visitor):
             source_id=source_id,
             target_id=target_id,
             description=description.strip(),
+            protocol=None,
+            tags=[],
             metadata=properties
         )
         if self.current_group:
@@ -70,21 +84,23 @@ class DSLVisitor(Visitor):
             target_id=target_id,
             description=description.strip(),
             is_dashed=("-->" in arrow),
+            protocol=None,
             metadata=properties
         )
         self.flow_steps.append(step)
 
-    def component_def(self, tree: Tree):
+    def component_def(self, tree: Tree[Any]) -> None: # noqa: PLR0912
         # ID, [type], [properties]
         args = tree.children
         comp_id = str(args[0])
         self.last_entity_id = comp_id
         
         comp_type_enum = ComponentType.generic
-        properties = {}
+        properties: dict[str, Any] = {}
         
         for arg in args[1:]:
-             if arg is None: continue
+             if arg is None:
+                 continue
              
              if isinstance(arg, Tree):
                  if arg.data == "type":
@@ -103,6 +119,7 @@ class DSLVisitor(Visitor):
             "metadata": properties
         }
 
+        comp: Component
         if comp_type_enum == ComponentType.person:
             comp = Person(**common_args)
         elif comp_type_enum == ComponentType.system:
@@ -127,32 +144,20 @@ class DSLVisitor(Visitor):
             
         self.components.append(comp)
 
-    def group_def(self, tree: Tree):
+    def group_def(self, tree: Tree[Any]) -> None:
         # group "Name" { statements }
         # tree.children[0] is name (ID or ESCAPED_STRING)
         name_token = tree.children[0]
-        original_group = self.current_group
+        # original_group = self.current_group  # Unused
         
         group_name = str(name_token).strip('"')
         self.current_group = group_name
         
-        # Visit children manually?
-        # Visitor visits children automatically, but we want to enforce context.
-        # Check if we need to manually traverse.
-        # Lark Visitor visits children first? No, Visitor visits node.
-        # We must call visit_children(tree) ??
-        # The default implementation of a method in Visitor does not visit children unless we don't define it?
-        # Use visit_children explicitly?
-        # No, Lark documentation says "To visit the children, you must call visit_children".
-        # wait, that's Interpreter. Visitor doesn't return anything.
-        # "Visits the tree, starting with the leaves and working up." (Bottom-up?)
-        # "For top-down, use `.visit_topdown`"
-        pass 
-        # Actually simplest way: Use `Interpreter` or just manual recursive function?
-        # Or `visit_topdown`.
-        # If I use `visit_topdown`, I set context, visit children, unset context.
+        # Traverse children (Lark Visitor is bottom-up, but we need context)
+        # Assuming we are using visit_topdown in the loader
+        pass
 
-    def note_def(self, tree: Tree):
+    def note_def(self, tree: Tree[Any]) -> None:
         # note "Text"
         text = str(tree.children[0]).strip('"')
         
@@ -164,14 +169,16 @@ class DSLVisitor(Visitor):
             source_id=anchor,
             target_id=anchor,
             description=text,
+            is_dashed=False,
+            protocol=None,
             metadata={"type": "note", "position": position}
         )
         self.flow_steps.append(step)
 
-    def _parse_properties(self, tree: Tree) -> dict:
+    def _parse_properties(self, tree: Tree[Any]) -> dict[str, Any]:
         props = {}
         for child in tree.children:
-            if child.data == "property":
+            if isinstance(child, Tree) and child.data == "property":
                 key = str(child.children[0])
                 val = str(child.children[1]).strip('"')
                 props[key] = val
@@ -185,7 +192,7 @@ class DSLLoader:
             self.grammar = f.read()
         self.parser = Lark(self.grammar, parser='lalr', propagate_positions=True)
 
-    def load_debug(self) -> Tuple[List[Component], List[Relationship], List[Flow]]:
+    def load_debug(self) -> tuple[list[Component], list[Relationship], list[Flow]]:
         relationships = []
         components = []
         flows = []
@@ -198,8 +205,7 @@ class DSLLoader:
         
         processed_files = set()
 
-        # Find ALL .flow files recursively? Or just in target dirs?
-        files = []
+        files: list[Path] = []
         for d in target_dirs:
             if d.exists():
                 print(f"DEBUG: Scanning dir {d}")
@@ -211,27 +217,28 @@ class DSLLoader:
 
 
         for file_path in files:
-            if str(file_path) in processed_files: continue
+            if str(file_path) in processed_files:
+                continue
             processed_files.add(str(file_path))
             
             try:
                 with open(file_path) as f:
                     text = f.read()
                 
-                config = {}
+                config: dict[str, Any] = {}
                 # Parsing YAML Frontmatter
                 if text.startswith("---"):
                     parts = text.split("---", 2)
-                    if len(parts) >= 3:
+                    if len(parts) >= 3: # noqa: PLR2004
                         frontmatter = parts[1]
                         dsl_content = parts[2]
                         try:
-                            from ruamel.yaml import YAML
-                            yaml = YAML(typ='safe')
-                            config = yaml.load(frontmatter) or {}
-                            # If config is nested under 'config' key
-                            if "config" in config:
-                                config = config["config"]
+                            if YAML is not None:
+                                yaml = YAML(typ='safe')
+                                config = yaml.load(frontmatter) or {}
+                                # If config is nested under 'config' key
+                                if "config" in config:
+                                    config = config["config"]
                             text = dsl_content
                         except Exception as e:
                             print(f"Error parsing frontmatter in {file_path}: {e}")
@@ -258,7 +265,6 @@ class DSLLoader:
                     
             except Exception as e:
                 print(f"Error parsing DSL file {file_path}: {e}")
-                import traceback
                 traceback.print_exc()
 
         return components, relationships, flows

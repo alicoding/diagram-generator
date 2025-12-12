@@ -25,7 +25,7 @@ class UnifiedConfig(BaseModel):
 @app.command()
 def generate(
     output: str | None = typer.Option(None, help="Output JSON file path. Defaults to stdout."),
-):
+) -> None:
     """
     Generates a JSON Schema for IDE validation (VS Code, JetBrains).
     """

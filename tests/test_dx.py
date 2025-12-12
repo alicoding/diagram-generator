@@ -1,4 +1,5 @@
 import json
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
@@ -12,7 +13,14 @@ from diagram_generator.core.use_cases.generate_diagram import GenerateDiagramUse
 
 runner = CliRunner()
 
-def test_schema_generation():
+def test_component_loading() -> None:
+    result = runner.invoke(app, ["schema", "generate"])
+    assert result.exit_code == 0
+    schema = json.loads(result.stdout)
+    assert "UnifiedConfig" in schema["title"]
+    assert "components" in schema["properties"]
+
+def test_schema_generation() -> None:
     result = runner.invoke(app, ["schema", "generate"])
     assert result.exit_code == 0
     schema = json.loads(result.stdout)
@@ -20,7 +28,7 @@ def test_schema_generation():
     assert "components" in schema["properties"]
     assert "views" in schema["properties"]
 
-def test_init_command(tmp_path):
+def test_init_command(tmp_path: Any) -> None:
     with patch("diagram_generator.cli.init.Path", side_effect=lambda *args: tmp_path / args[0] if args else tmp_path):
         # We need to run inside tmp_path so the relative path logic works or just pass absolute path
         # Let's pass the path explicitly to the command
@@ -38,26 +46,43 @@ def test_init_command(tmp_path):
         assert "$schema=../../schema.json" in content
 
 
-def test_quick_draw_auto_discovery():
+def test_quick_draw_auto_discovery() -> None:
     """Test that missing components are auto-created as 'generic'."""
     # Mock ports
     mock_metadata = MagicMock()
     mock_diagram = MagicMock()
     
-    real_comp = Service(id="real", name="Real", type=ComponentType.service)
+    real_comp = Service(
+        id="real", 
+        name="Real", 
+        type=ComponentType.service, 
+        description="d", 
+        technologies=["t"],
+        business_logic={"rules": "b"},
+        apis_exposed=[]
+    )
     # Relationship refers to 'ghost' which doesn't exist
-    rel = Relationship(source_id="real", target_id="ghost", description="Who you gonna call?")
+    rel = Relationship(source_id="real", target_id="ghost", description="c", protocol=None)
+    assert rel.source_id == "real"
     
     mock_metadata.load_components.return_value = [real_comp]
     mock_metadata.load_relationships.return_value = [rel]
     mock_metadata.load_view_configs.return_value = [
-        ViewConfig(key="context", title="Ctx", type=DiagramType.c4_context)
+        ViewConfig(
+            key="test", 
+            title="Test", 
+            type=DiagramType.sequence,
+            scope_id="all",
+            show_legend=True,
+            group_by=None,
+            flow_id=None
+        )
     ]
     mock_metadata.load_flows.return_value = []
     
     use_case = GenerateDiagramUseCase(mock_metadata, mock_diagram)
     
-    use_case.execute("context")
+    use_case.execute("test")
     
     # Check what was passed to render
     call_args = mock_diagram.render.call_args
@@ -70,7 +95,7 @@ def test_quick_draw_auto_discovery():
     assert ghost.type == ComponentType.generic
     assert ghost.name == "ghost"
 
-def test_serve_command_mock(tmp_path):
+def test_serve_command_mock(tmp_path: Any) -> None:
     """Test that serve command attempts to start observer and server."""
     # We patch watchdog classes where they are defined, because they are lazy imported in serve.py
     with patch("watchdog.observers.Observer"), \

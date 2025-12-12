@@ -52,7 +52,7 @@ class UIComponent(BaseModel):
 # --- Base Component ---
 
 class BaseComponent(BaseModel):
-    id: constr(pattern=r'^[a-zA-Z0-9-_]+$') = Field(
+    id: constr(pattern=r'^[a-zA-Z0-9-_]+$') = Field( # type: ignore
         ..., description="Unique identifier for the component."
     )
     name: str = Field(..., description='Human-readable name.')

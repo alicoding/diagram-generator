@@ -51,9 +51,9 @@ sequenceDiagram
             {% if anchor == 'NOTE_ANCHOR' %}
                 {% set anchor = components[0].id %}
             {% endif %}
-    Note {{ step.metadata.position }} {{ anchor }}: {{ step.description }}
+    Note {{ step.metadata.position }} {{ anchor }}: {{ step.description | replace('\n', '<br/>') }}
         {% else %}
-    {{ step.source_id }}{% if step.is_dashed %}-->>{% else %}->>{% endif %}{{ step.target_id }}: {{ step.description }}
+    {{ step.source_id }}{% if step.is_dashed %}-->>{% else %}->>{% endif %}{{ step.target_id }}: {{ step.description | replace('\n', '<br/>') }}
         {% endif %}
     {% endfor %}
 {% else %}

@@ -13,7 +13,7 @@ console = Console()
 def project(
     path: Path = typer.Option(Path("."), help="Directory to initialize the project in."), # noqa: B008
     name: str = typer.Option("My System", help="Name of the system."),
-):
+) -> None:
     """
     Scaffolds a new diagram-generator project with directories, schema, and sample data.
     """

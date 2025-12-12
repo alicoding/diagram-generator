@@ -2,14 +2,16 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import TypeAdapter
+from rich.console import Console
+from rich.table import Table
 from ruamel.yaml import YAML
 
+from diagram_generator.adapters.input.dsl_loader import DSLLoader
 from diagram_generator.core.domain.component import Component
 from diagram_generator.core.domain.flow import Flow
 from diagram_generator.core.domain.relationship import Relationship
 from diagram_generator.core.domain.view_config import ViewConfig
 from diagram_generator.core.ports.metadata_port import MetadataPort
-from diagram_generator.adapters.input.dsl_loader import DSLLoader
 
 
 class YAMLMetadataAdapter(MetadataPort):
@@ -17,7 +19,7 @@ class YAMLMetadataAdapter(MetadataPort):
         self.data_path = Path(data_path)
         self.yaml = YAML(typ='safe')
         self.dsl_loader = DSLLoader(self.data_path)
-        self._dsl_cache = None
+        self._dsl_cache: tuple[list[Component], list[Relationship], list[Flow]] | None = None
 
     def _load_files(self, directory: str) -> list[dict[str, Any]]:
         results = []
@@ -42,7 +44,11 @@ class YAMLMetadataAdapter(MetadataPort):
     def _load_yaml(self, file_path: Path) -> dict[str, Any]:
         """Helper to load a single YAML file."""
         with open(file_path) as f:
-            return self.yaml.load(f)
+            # Explicitly cast or assert dict
+            data = self.yaml.load(f)
+            if not isinstance(data, dict):
+                return {}
+            return data
 
     def _unwrap_data(self, raw_data: list[dict[str, Any]], key: str) -> list[dict[str, Any]]:
         """Helper to unwrap data if it's nested under a root key."""
@@ -54,7 +60,7 @@ class YAMLMetadataAdapter(MetadataPort):
                 unwrapped.append(item)
         return unwrapped
 
-    def _load_dsl(self):
+    def _load_dsl(self) -> tuple[list[Component], list[Relationship], list[Flow]]:
         if self._dsl_cache is None:
             self._dsl_cache = self.dsl_loader.load_debug()
         return self._dsl_cache
@@ -67,8 +73,6 @@ class YAMLMetadataAdapter(MetadataPort):
         valid_components = []
         errors = []
         
-        from rich.console import Console
-        from rich.table import Table
         console = Console()
 
         for index, item in enumerate(data):
@@ -137,7 +141,7 @@ class YAMLMetadataAdapter(MetadataPort):
         for item in data:
             try:
                 valid_flows.append(adapter.validate_python(item))
-            except Exception as e:
+            except Exception:
                 pass # Already handled logging elsewhere or simple skip
 
         # Merge DSL Flows

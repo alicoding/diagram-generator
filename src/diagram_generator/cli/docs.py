@@ -47,7 +47,7 @@ def model_to_markdown(model: type[BaseModel], title: str) -> str:
 @app.command()
 def generate(
     output: str = typer.Option("FEATURES.md", help="Output Markdown file.")
-):
+) -> None:
     """
     Generates a FEATURES.md reference manual from the code definitions.
     """

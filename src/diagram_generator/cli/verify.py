@@ -1,6 +1,7 @@
 
-import typer
 from pathlib import Path
+
+import typer
 from rich.console import Console
 
 from diagram_generator.adapters.input.yaml_loader import YAMLMetadataAdapter
@@ -31,7 +32,10 @@ def view(
             raise typer.Exit(code=1)
             
         if not view.flow_id:
-            console.print(f"[yellow]View '{view_key}' is not linked to a flow. Verification only supports Flows currently.[/yellow]")
+            console.print(
+                f"[yellow]View '{view_key}' is not linked to a flow. "
+                "Verification only supports Flows currently.[/yellow]"
+            )
             return
 
         flow = next((f for f in flows if f.id == view.flow_id), None)
@@ -51,13 +55,13 @@ def view(
         result = verifier.verify_flow(flow, mmd_path.read_text())
 
         if result.success:
-            console.print(f"[green]✓ Verification Passed[/green]")
+            console.print("[green]✓ Verification Passed[/green]")
         else:
-            console.print(f"[red]✗ Verification Failed[/red]")
+            console.print("[red]✗ Verification Failed[/red]")
             for err in result.errors:
                 console.print(f"  - {err}")
             raise typer.Exit(code=1)
 
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e

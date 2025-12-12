@@ -10,7 +10,7 @@ app = typer.Typer()
 console = Console()
 
 @app.command()
-def start():
+def start() -> None:
     """Starts the MCP server for LLM integration."""
     try:
         from fastmcp import FastMCP  # noqa: PLC0415
@@ -19,7 +19,7 @@ def start():
         console.print("Install it with: [cyan]pip install 'diagram-generator[mcp]'[/cyan] or [cyan]pip install fastmcp[/cyan]") # noqa: E501
         raise typer.Exit(1) from None
 
-    mcp = FastMCP("diagram-generator")
+    mcp: Any = FastMCP("diagram-generator")
 
     # Define tools inside `start` or structured better?
     # FastMCP relies on decorators on the `mcp` object.
@@ -30,13 +30,13 @@ def start():
     
     # Refactoring to define tools inside start is cleaner for this "optional" pattern.
     
-    @mcp.tool()
+    @mcp.tool() # type: ignore
     def list_components(data_dir: str = "./data") -> list[dict[str, Any]]:
         """Lists all components in the system."""
         loader = YAMLMetadataAdapter(data_dir)
         return [c.model_dump() for c in loader.load_components()]
 
-    @mcp.tool()
+    @mcp.tool() # type: ignore
     def add_service(id: str, name: str, description: str, cluster: str, data_dir: str = "./data") -> str:
         """Adds a new microservice to the system."""
         path = Path(data_dir) / "components" / "services.yaml"
