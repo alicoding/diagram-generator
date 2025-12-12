@@ -21,6 +21,7 @@ graph TB
         {% for comp in node.node_components %}
             {% set styleClass = comp.metadata.style if comp.metadata.style else "" %}
             {{ comp.id }}["{{ comp.name }}<br/>{{ comp.metadata.participant_name if comp.metadata.participant_name else '' }}"]{% if styleClass %}:::{{ styleClass }}{% endif %}
+            
         {% endfor %}
     {% endmacro %}
 

@@ -54,6 +54,40 @@ class GenerateDiagramUseCase:
             if r.source_id in filtered_component_ids and r.target_id in filtered_component_ids
         ]
 
+        # 3.5 Abstraction (Roll-up)
+        if view_config.abstraction_level:
+            from diagram_generator.core.services.flow_abstractor import FlowAbstractor
+            abstractor = FlowAbstractor()
+            # For abstraction, we might need access to ALL components to resolve parents,
+            # even if they were filtered out by tags originally. 
+            # But usually we want to abstract the filtered set?
+            # Actually, standard logic is: Use All Components for resolution.
+            all_flows, extra_components = abstractor.abstract_flows(all_flows, all_components, view_config.abstraction_level)
+            
+            # Add synthetic group components to the pool
+            all_components.extend(extra_components)
+            
+            # For abstraction, we ONLY want the high-level components (parents) involved in the flow.
+            # We should replace filtered_components with extra_components (the parents) 
+            # and potentially the parents of parents?
+            # Abstractor.abstract_flows returns `extra_components` which are the synthetic parents.
+            # But the flow might also involve "Leaf nodes" that didn't need abstraction (e.g. they were already at the right level).
+            # So we should gather all components referenced in `all_flows` (the abstracted flows).
+            
+            abstracted_ids = set()
+            for f in all_flows:
+                for s in f.steps:
+                    abstracted_ids.add(s.source_id)
+                    abstracted_ids.add(s.target_id)
+            
+            # Re-select components from all_components
+            filtered_components = [c for c in all_components if c.id in abstracted_ids]
+            
+            # CRITICAL: The abstractor generated new flows with suffixes.
+            # We need to update the requested flow_id to match the abstracted version.
+            if view_config.flow_id:
+                view_config.flow_id = f"{view_config.flow_id}_{view_config.abstraction_level}"
+
         # 4. Render
         return self._diagram_port.render(view_config, filtered_components, filtered_relationships, all_flows)
 

@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -45,4 +45,7 @@ class ViewConfig(BaseModel):
     flow_id: str | None = Field(None, description="ID of the flow to render (for sequence diagrams).")
     mermaid_config: dict[str, Any] = Field(
         default_factory=dict, description="Mermaid frontmatter config (e.g. layout: elk)."
+    )
+    abstraction_level: Literal['system', 'container', 'component'] | None = Field(
+        None, description="Level of abstraction to roll up to (system=Root Group, container=L1 Group)."
     )

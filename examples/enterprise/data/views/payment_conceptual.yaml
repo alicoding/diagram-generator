@@ -1,0 +1,8 @@
+views:
+  - key: payment-conceptual
+    title: "Payment Landscape (Conceptual)"
+    type: flowchart_swimlane
+    flow_id: payment-flow-composite
+    abstraction_level: system
+    mermaid_config:
+      direction: TB
