@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../../../schema.json
+components:
+  - id: api-gateway
+    name: API Gateway
+    type: service
+    description: Routes requests and handles rate limiting.
+    deployment:
+      cluster: edge-cluster
+
+  - id: auth-service
+    name: Auth Service
+    type: service
+    description: Manages user authentication and issue tokens.
+    deployment:
+      cluster: core-cluster
+
+  - id: account-service
+    name: Account Service
+    type: service
+    description: Manages customer accounts and balances.
+    deployment:
+      cluster: core-cluster
+
+  - id: payment-service
+    name: Payment Service
+    type: service
+    description: Orchestrates payment processing.
+    deployment:
+      cluster: core-cluster
+
+  - id: fraud-service
+    name: Fraud Detection
+    type: service
+    description: Analyzes transactions for suspicious activity.
+    deployment:
+      cluster: analytics-cluster
+
+  - id: notification-service
+    name: Notification Service
+    type: service
+    description: Sends emails and SMS to customers.
+    deployment:
+      cluster: support-cluster

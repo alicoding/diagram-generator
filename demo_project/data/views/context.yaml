@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=../../schema.json
+views:
+  - key: context
+    title: System Context
+    type: c4_context
+    mermaid_config:
+      theme: base

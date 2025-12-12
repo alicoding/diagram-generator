@@ -1,0 +1,38 @@
+components:
+  - id: compliance-system
+    name: Compliance System
+    type: system
+    description: Enterprise Compliance Platform
+
+  - id: compliance-officer
+    name: Compliance Officer
+    type: person
+    description: Reviews high-risk cases
+  - id: risk-service
+    name: Risk Assessment Platform
+    type: service
+    description: Generic risk calculation engine
+    metadata:
+      owner: Compliance Team
+    deployment:
+      cluster: GKE - Services
+      container_name: risk-platform
+    apis_exposed:
+      - name: Submit Assessment
+        endpoint: POST /api/v1/assess
+        purpose: Final decision
+    business_logic:
+      decision_criteria: "AUTO_PASS if score > 90"
+
+  - id: risk-db
+    name: Risk Database
+    type: database
+    technology: PostgreSQL
+    details:
+      name: risk-db-prod
+      type: CloudSQL
+      tables:
+        - name: assessments
+          columns:
+            - id
+            - score

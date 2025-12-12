@@ -1,0 +1,25 @@
+views:
+  - key: context-view
+    title: "System Context View"
+    type: c4_context
+    theme:
+      primaryColor: "#00aa00"
+    show_legend: true
+
+  - key: container-view
+    title: "Container View"
+    type: c4_container
+
+  - key: sequence-view
+    title: "Assessment Sequence"
+    type: sequence
+    flow_id: risk-assessment-flow
+    theme:
+      actorBkg: "#eeeeee"
+
+  - key: swimlane-view
+    title: "Swimlane Diagram"
+    type: flowchart
+    group_by: owner
+    layout:
+      direction: LR

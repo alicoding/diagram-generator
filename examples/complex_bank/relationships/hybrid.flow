@@ -1,0 +1,8 @@
+# Hybrid Diagramming
+# Connect fully-defined components (YAML) to quick-sketched ideas (DSL)
+
+# 'api-gateway' is defined in services.yaml (with description, cluster, etc.)
+# 'mobile_v2' is NEW (Implicit)
+
+mobile_v2 -> api-gateway : JSON via HTTPS
+api-gateway -> legacy_mainframe : gRPC (Legacy)

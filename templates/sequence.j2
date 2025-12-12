@@ -1,0 +1,64 @@
+{% if flow and flow.metadata.config %}
+---
+config:
+{{ flow.metadata.config | to_yaml | indent(2, true) }}
+---
+{% endif %}
+{% import 'theme.j2' as theme_macros %}
+{{ theme_macros.render_theme(config) }}
+sequenceDiagram
+    title {{ config.title }}
+    autonumber
+
+    %% Participants with Grouping
+    {% set ns = namespace(grouped_ids=[]) %}
+    
+    %% 1. Find all unique groups
+    {% set groups = {} %}
+    {% for comp in components %}
+        {% if comp.metadata and comp.metadata.group %}
+            {% set gname = comp.metadata.group %}
+            {% if gname not in groups %}
+                {% set _ = groups.update({gname: []}) %}
+            {% endif %}
+            {% set _ = groups[gname].append(comp) %}
+            {% set ns.grouped_ids = ns.grouped_ids + [comp.id] %}
+        {% endif %}
+    {% endfor %}
+
+    %% 2. Render Groups (Boxes)
+    {% for gname, comps in groups.items() %}
+    box "{{ gname }}" #f9f9f9
+        {% for comp in comps %}
+        participant {{ comp.id }} as {{ comp.name }}
+        {% endfor %}
+    end
+    {% endfor %}
+
+    %% 3. Render Ungrouped Participants
+    {% for comp in components %}
+        {% if comp.id not in ns.grouped_ids %}
+        participant {{ comp.id }} as {{ comp.name }}
+        {% endif %}
+    {% endfor %}
+
+    %% 4. Relationships / Flow
+{% if flow %}
+    %% Render Flow: {{ flow.description }}
+    {% for step in flow.steps %}
+        {% if step.metadata and step.metadata.type == 'note' %}
+            {% set anchor = step.source_id %}
+            {% if anchor == 'NOTE_ANCHOR' %}
+                {% set anchor = components[0].id %}
+            {% endif %}
+    Note {{ step.metadata.position }} {{ anchor }}: {{ step.description }}
+        {% else %}
+    {{ step.source_id }}{% if step.is_dashed %}-->>{% else %}->>{% endif %}{{ step.target_id }}: {{ step.description }}
+        {% endif %}
+    {% endfor %}
+{% else %}
+    %% Fallback: Render static relationships
+    {% for rel in relationships %}
+    {{ rel.source_id }}->>{{ rel.target_id }}: {{ rel.description }}
+    {% endfor %}
+{% endif %}

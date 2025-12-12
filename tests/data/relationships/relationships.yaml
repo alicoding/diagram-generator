@@ -1,0 +1,8 @@
+relationships:
+  - source_id: compliance-officer
+    target_id: compliance-system
+    description: "Reviews cases"
+  - source_id: compliance-system
+    target_id: risk-service
+    description: "Delegates risk calculation"
+    protocol: "HTTPS"

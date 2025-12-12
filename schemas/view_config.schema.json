@@ -1,0 +1,50 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/schemas/view_config.schema.json",
+    "title": "ViewConfig",
+    "description": "Configuration for generating a specific diagram view.",
+    "type": "object",
+    "required": [
+        "key",
+        "title",
+        "type"
+    ],
+    "properties": {
+        "key": {
+            "type": "string",
+            "description": "Unique key for this view configuration."
+        },
+        "title": {
+            "type": "string",
+            "description": "Title to display on the diagram."
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "c4_context",
+                "c4_container",
+                "sequence"
+            ],
+            "description": "Type of diagram to generate."
+        },
+        "scope_id": {
+            "type": "string",
+            "description": "ID of the component to focus on (for container/component views)."
+        },
+        "filters": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "include_external": {
+                    "type": "boolean",
+                    "default": true
+                }
+            }
+        }
+    }
+}

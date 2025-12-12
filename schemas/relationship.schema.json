@@ -1,0 +1,36 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/schemas/relationship.schema.json",
+    "title": "Relationship",
+    "description": "A directed relationship between two components.",
+    "type": "object",
+    "required": [
+        "source_id",
+        "target_id",
+        "description"
+    ],
+    "properties": {
+        "source_id": {
+            "type": "string",
+            "description": "ID of the source component."
+        },
+        "target_id": {
+            "type": "string",
+            "description": "ID of the target component."
+        },
+        "description": {
+            "type": "string",
+            "description": "Description of the interaction (e.g., 'Sends email to')."
+        },
+        "protocol": {
+            "type": "string",
+            "description": "Communication protocol (e.g., 'gRPC', 'HTTPS')."
+        },
+        "tags": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}

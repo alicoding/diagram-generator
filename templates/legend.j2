@@ -1,0 +1,17 @@
+{% macro render_legend(config, components) %}
+{% if config.show_legend %}
+    subgraph Legend
+        direction TB
+        L1(System)
+        L2(Container)
+        L3(Component)
+        L4(Database)
+        L5(Person)
+        style L1 fill:#1168bd,stroke:#0b4884,color:#ffffff
+        style L2 fill:#438dd5,stroke:#336699,color:#ffffff
+        style L3 fill:#85bbf0,stroke:#5d82a8,color:#000000
+        style L4 fill:#999999,stroke:#666666,color:#ffffff
+        style L5 fill:#08427b,stroke:#052e56,color:#ffffff
+    end
+{% endif %}
+{% endmacro %}

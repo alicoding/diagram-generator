@@ -1,0 +1,66 @@
+relationships:
+  # Customer interactions
+  - source_id: customer
+    target_id: api-gateway
+    description: Uses Mobile App
+    technology: HTTPS/JSON
+
+  # Gateway Routing
+  - source_id: api-gateway
+    target_id: auth-service
+    description: Authenticates via
+    technology: gRPC
+  - source_id: api-gateway
+    target_id: account-service
+    description: Proxies to
+    technology: gRPC
+  - source_id: api-gateway
+    target_id: payment-service
+    description: Proxies to
+    technology: gRPC
+
+  # Service Dependencies
+  - source_id: payment-service
+    target_id: account-service
+    description: Checks balance
+    technology: gRPC
+  - source_id: payment-service
+    target_id: fraud-service
+    description: Scores transaction
+    technology: gRPC
+  - source_id: payment-service
+    target_id: swift-network
+    description: Executes wire
+    technology: SOAP/XML
+  
+  # Async Flows
+  - source_id: payment-service
+    target_id: payment-events
+    description: Publishes 'PaymentInitiated'
+    technology: Kafka Producer
+  - source_id: notification-service
+    target_id: payment-events
+    description: Consumes events
+    technology: Kafka Consumer
+  - source_id: notification-service
+    target_id: email-provider
+    description: Sends email via
+    technology: HTTPS
+
+  # Data Access
+  - source_id: auth-service
+    target_id: core-db
+    description: Reads/Writes Users
+    technology: SQL
+  - source_id: account-service
+    target_id: core-db
+    description: Reads/Writes Accounts
+    technology: SQL
+  - source_id: payment-service
+    target_id: ledger-db
+    description: Appends Transaction
+    technology: QLQL
+  - source_id: fraud-service
+    target_id: fraud-cache
+    description: Reads Rules
+    technology: Redis Protocol

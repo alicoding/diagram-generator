@@ -1,0 +1,34 @@
+start: statement+
+
+// Statements
+statement: connection | component_def | group_def | note_def | comment
+
+// 1. Connection: A -> B : Label
+connection: ID arrow ID [":" description] [properties]
+
+// 2. Component: User [icon: user]
+component_def: ID [type] [properties]
+
+// 3. Group: group "Name" { ... }
+group_def: "group" (ID | ESCAPED_STRING) "{" statement+ "}"
+
+// 4. Properties: [icon: aws, color: red]
+// We use a simplified property list
+properties: "[" property ("," property)* "]"
+property: ID ":" (ID | ESCAPED_STRING | NUMBER)
+
+// 5. Notes: note "Text"
+note_def: "note" (ID | ESCAPED_STRING)
+
+arrow: ARROW | DARROW
+description: /[^[\n]+/
+comment: /#.*/
+type: ID
+
+ARROW: "->" | "->>"
+DARROW: "-->" | "-->>"
+ID: /[a-zA-Z0-9_][a-zA-Z0-9_\-]*/
+%import common.ESCAPED_STRING
+%import common.NUMBER
+%import common.WS
+%ignore WS

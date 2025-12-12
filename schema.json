@@ -1,0 +1,1229 @@
+{
+  "$defs": {
+    "ApiEndpoint": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "endpoint": {
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "purpose": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Purpose"
+        },
+        "method": {
+          "anyOf": [
+            {
+              "enum": [
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "PATCH"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Method"
+        }
+      },
+      "required": [
+        "name",
+        "endpoint"
+      ],
+      "title": "ApiEndpoint",
+      "type": "object"
+    },
+    "Container": {
+      "description": "Generic container if Service/WebUI/Database doesn't fit.",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "container",
+          "default": "container",
+          "title": "Type",
+          "type": "string"
+        },
+        "technologies": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Container",
+      "type": "object"
+    },
+    "Database": {
+      "description": "A data store.",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "database",
+          "default": "database",
+          "title": "Type",
+          "type": "string"
+        },
+        "technology": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Technology"
+        },
+        "details": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DatabaseDetails"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Database",
+      "type": "object"
+    },
+    "DatabaseDetails": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "tables": {
+          "items": {
+            "$ref": "#/$defs/TableSchema"
+          },
+          "title": "Tables",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "title": "DatabaseDetails",
+      "type": "object"
+    },
+    "DeploymentDetails": {
+      "properties": {
+        "cluster": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cluster"
+        },
+        "container_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Container Name"
+        },
+        "replicas": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Replicas"
+        },
+        "namespace": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Namespace"
+        }
+      },
+      "title": "DeploymentDetails",
+      "type": "object"
+    },
+    "ExternalSystem": {
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "external_system",
+          "default": "external_system",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "ExternalSystem",
+      "type": "object"
+    },
+    "Filters": {
+      "properties": {
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tags"
+        },
+        "include_external": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": true,
+          "title": "Include External"
+        }
+      },
+      "title": "Filters",
+      "type": "object"
+    },
+    "Flow": {
+      "properties": {
+        "id": {
+          "description": "Unique ID for this flow.",
+          "title": "Id",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of what this flow represents.",
+          "title": "Description",
+          "type": "string"
+        },
+        "steps": {
+          "description": "Ordered steps in the flow.",
+          "items": {
+            "$ref": "#/$defs/FlowStep"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "description"
+      ],
+      "title": "Flow",
+      "type": "object"
+    },
+    "FlowStep": {
+      "properties": {
+        "source_id": {
+          "description": "ID of the source component.",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "description": "ID of the target component.",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the interaction.",
+          "title": "Description",
+          "type": "string"
+        },
+        "protocol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Protocol used (optional).",
+          "title": "Protocol"
+        },
+        "is_dashed": {
+          "default": false,
+          "description": "If true, render as dashed line.",
+          "title": "Is Dashed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "description"
+      ],
+      "title": "FlowStep",
+      "type": "object"
+    },
+    "LegacySystem": {
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "legacy_system",
+          "default": "legacy_system",
+          "title": "Type",
+          "type": "string"
+        },
+        "retention": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retention"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "LegacySystem",
+      "type": "object"
+    },
+    "Person": {
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "person",
+          "default": "person",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Person",
+      "type": "object"
+    },
+    "Relationship": {
+      "properties": {
+        "source_id": {
+          "description": "ID of the source component.",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "description": "ID of the target component.",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the interaction (e.g., 'Sends email to').",
+          "title": "Description",
+          "type": "string"
+        },
+        "protocol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Communication protocol (e.g., 'gRPC', 'HTTPS').",
+          "title": "Protocol"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tags"
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "description"
+      ],
+      "title": "Relationship",
+      "type": "object"
+    },
+    "Service": {
+      "description": "A deployable service / API application.",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "service",
+          "default": "service",
+          "title": "Type",
+          "type": "string"
+        },
+        "layer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Layer"
+        },
+        "deployment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeploymentDetails"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "apis_exposed": {
+          "items": {
+            "$ref": "#/$defs/ApiEndpoint"
+          },
+          "title": "Apis Exposed",
+          "type": "array"
+        },
+        "business_logic": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Business rules/logic details",
+          "title": "Business Logic"
+        },
+        "technologies": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Service",
+      "type": "object"
+    },
+    "System": {
+      "description": "High-level system (e.g., Legacy Systems).",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "system",
+          "default": "system",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "System",
+      "type": "object"
+    },
+    "TableSchema": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "retention": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retention"
+        },
+        "columns": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Columns"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "TableSchema",
+      "type": "object"
+    },
+    "Type": {
+      "enum": [
+        "c4_context",
+        "c4_container",
+        "sequence",
+        "flowchart"
+      ],
+      "title": "Type",
+      "type": "string"
+    },
+    "UIComponent": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "integration": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Integration"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "UIComponent",
+      "type": "object"
+    },
+    "ViewConfig": {
+      "properties": {
+        "key": {
+          "description": "Unique key for this view configuration.",
+          "title": "Key",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title to display on the diagram.",
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/Type",
+          "description": "Type of diagram to generate."
+        },
+        "scope_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ID of the component to focus on (for container/component views).",
+          "title": "Scope Id"
+        },
+        "filters": {
+          "$ref": "#/$defs/Filters",
+          "description": "Filters like tags, include_external."
+        },
+        "theme": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Mermaid theme variables (primaryColor, etc.).",
+          "title": "Theme",
+          "type": "object"
+        },
+        "layout": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Layout config (direction: TB/LR, etc.).",
+          "title": "Layout",
+          "type": "object"
+        },
+        "show_legend": {
+          "default": true,
+          "description": "Whether to display a legend.",
+          "title": "Show Legend",
+          "type": "boolean"
+        },
+        "group_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Field to group components by (e.g. 'owner', 'system').",
+          "title": "Group By"
+        },
+        "flow_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ID of the flow to render (for sequence diagrams).",
+          "title": "Flow Id"
+        },
+        "mermaid_config": {
+          "additionalProperties": true,
+          "description": "Mermaid frontmatter config (e.g. layout: elk).",
+          "title": "Mermaid Config",
+          "type": "object"
+        }
+      },
+      "required": [
+        "key",
+        "title",
+        "type"
+      ],
+      "title": "ViewConfig",
+      "type": "object"
+    },
+    "WebUI": {
+      "description": "A frontend application.",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the component.",
+          "pattern": "^[a-zA-Z0-9-_]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name.",
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brief description.",
+          "title": "Description"
+        },
+        "tags": {
+          "description": "Tags for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary metadata (owner, tier, etc.).",
+          "title": "Metadata",
+          "type": "object"
+        },
+        "link": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Link"
+        },
+        "type": {
+          "const": "web_ui",
+          "default": "web_ui",
+          "title": "Type",
+          "type": "string"
+        },
+        "ui_components": {
+          "items": {
+            "$ref": "#/$defs/UIComponent"
+          },
+          "title": "Ui Components",
+          "type": "array"
+        },
+        "technologies": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "WebUI",
+      "type": "object"
+    }
+  },
+  "description": "Root schema for validating any diagram-generator YAML file.\nVS Code will match the top-level keys.",
+  "properties": {
+    "components": {
+      "anyOf": [
+        {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Service"
+              },
+              {
+                "$ref": "#/$defs/Database"
+              },
+              {
+                "$ref": "#/$defs/WebUI"
+              },
+              {
+                "$ref": "#/$defs/LegacySystem"
+              },
+              {
+                "$ref": "#/$defs/System"
+              },
+              {
+                "$ref": "#/$defs/Person"
+              },
+              {
+                "$ref": "#/$defs/Container"
+              },
+              {
+                "$ref": "#/$defs/ExternalSystem"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "List of system components.",
+      "title": "Components"
+    },
+    "relationships": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/Relationship"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "List of relationships between components.",
+      "title": "Relationships"
+    },
+    "views": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/ViewConfig"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "List of diagram view configurations.",
+      "title": "Views"
+    },
+    "flows": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/Flow"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "List of sequence flows.",
+      "title": "Flows"
+    }
+  },
+  "title": "UnifiedConfig",
+  "type": "object"
+}

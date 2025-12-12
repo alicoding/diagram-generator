@@ -1,0 +1,8 @@
+
+views:
+  - key: eraser-showcase
+    title: Eraser.io Parity Demo
+    type: sequence
+    flow_id: eraser-case
+    mermaid_config:
+      theme: neutral

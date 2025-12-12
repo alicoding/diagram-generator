@@ -1,0 +1,74 @@
+{% if flow and flow.metadata.config %}
+---
+config:
+{{ flow.metadata.config | to_yaml | indent(2, true) }}
+---
+{% endif %}
+{% import 'theme.j2' as theme_macros %}
+{{ theme_macros.render_theme(config) }}
+graph TB
+
+
+    %% Grouping Logic
+    {% set ns = namespace(grouped_ids=[]) %}
+    {% set groups = {} %}
+    
+    {% for comp in components %}
+        {% if comp.metadata and comp.metadata.group %}
+            {% set gname = comp.metadata.group %}
+            {% if gname not in groups %}
+                {% set _ = groups.update({gname: []}) %}
+            {% endif %}
+            {% set _ = groups[gname].append(comp) %}
+            {% set ns.grouped_ids = ns.grouped_ids + [comp.id] %}
+        {% endif %}
+    {% endfor %}
+
+    %% Render Subgraphs (Swimlanes)
+    {% for gname, comps in groups.items() %}
+    subgraph "{{ gname }}"
+        direction TB
+        {% for comp in comps %}
+        {{ comp.id }}["{{ comp.name }}<br/>{{ comp.metadata.participant_name }}"]
+        {% if comp.metadata.icon %}
+        %% Icon support could be added here if Mermaid supports it via style or html labels
+        {% endif %}
+        {% endfor %}
+    end
+    {% endfor %}
+
+    %% Render Ungrouped Components
+    {% for comp in components %}
+        {% if comp.id not in ns.grouped_ids %}
+        {{ comp.id }}["{{ comp.name }}"]
+        {% endif %}
+    {% endfor %}
+
+    %% Render Flow Connections
+    {% if flow %}
+        {% for step in flow.steps %}
+            {% if step.metadata.type == 'note' %}
+                %% Notes in Flowchart are tricky. We can use a distinct node shape.
+                %% Or attach to edge if Mermaid supported it nicely.
+                %% For now, skip or render as a comment/node?
+                %% Let's render as a distinctive node.
+                {{ step.source_id }}[/"{{ step.description }}"/]:::note
+                {% if step.source_id != 'NOTE_ANCHOR' %}
+                    {{ step.source_id }} -.- {{ step.metadata.position }}
+                {% endif %}
+            {% else %}
+                {{ step.source_id }} {{ "-->" if step.is_dashed else "-->" }} {{ step.target_id }}
+                {% if step.description %}
+                {{ step.source_id }} -- "{{ step.description }}" --> {{ step.target_id }}
+                {% else %}
+                {{ step.source_id }} --> {{ step.target_id }}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        {% for rel in relationships %}
+            {{ rel.source_id }} --> {{ rel.target_id }}
+        {% endfor %}
+    {% endif %}
+
+    classDef note fill:#fff5ad,stroke:#d9b805,stroke-width:1px,border-style:dashed;

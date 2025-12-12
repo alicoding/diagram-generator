@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../schema.json
+components:
+  - id: user
+    name: User
+    type: person
+    description: A user of the system.
+
+  - id: system
+    name: Test Bank
+    type: system
+    description: The main software system.

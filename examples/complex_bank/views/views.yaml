@@ -1,0 +1,42 @@
+views:
+  # View 1: The Big Picture (C4 Context)
+  # O(1) Benefit: Uses same components/relationships as deep dives.
+  - key: bank-context
+    title: "System Landscape: Modern Bank"
+    type: c4_context
+    theme:
+      primaryColor: "#1a237e" # Dark Blue
+
+  # View 2: Infrastructure Detail (C4 Container)
+  # O(1) Benefit: Shows internal clusters defined in 'deployment' properties.
+  - key: bank-containers
+    title: "Container Architecture"
+    type: c4_container
+    theme:
+      primaryColor: "#004d40" # Teal
+
+  # View 3: Logic Validation (Sequence)
+  # SSOT Benefit: Generated directly from the 'international-transfer' Flow object.
+  # No manual syncing of arrows.
+  - key: transfer-sequence
+    title: "Flow: International Transfer"
+    type: sequence
+    flow_id: international-transfer
+    theme:
+      actorBkg: "#ff6f00" # Amber for actors
+      signalColor: "#37474f"
+
+  # View 4: Process & Grouping (Flowchart)
+  # SSOT Benefit: Same nodes, but arranged to show "Data Processing" grouping.
+  - key: processing-flow
+    title: "Async Data Processing"
+    type: flowchart
+    group_by: deployment.cluster # Auto-clusters Payment, Fraud, Support services
+    layout_direction: LR
+    filters:
+      # Show only backend processing, hide customer
+      tags: [] 
+    mermaid_config:
+      layout: elk
+    theme:
+      primaryColor: "#4a148c" # Purple

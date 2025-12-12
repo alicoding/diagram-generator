@@ -1,0 +1,39 @@
+---
+title: {{ config.title }}
+{% if config.mermaid_config %}
+config:
+  {{ config.mermaid_config | tojson }}
+{% endif %}
+---
+{% import 'theme.j2' as theme_macros %}
+{{ theme_macros.render_theme(config) }}
+graph {{ config.layout.get('direction', 'TB') }}
+
+{% if config.group_by %}
+    {# Group components by the specified field (e.g. 'owner' or 'system') #}
+    {% set ns = namespace(groups={}) %}
+    {% for component in components %}
+        {% set group_key = component.metadata.get(config.group_by, 'Default') %}
+        {% if group_key not in ns.groups %}
+            {% set _ = ns.groups.update({group_key: []}) %}
+        {% endif %}
+        {% set _ = ns.groups[group_key].append(component) %}
+    {% endfor %}
+
+    {% for group_name, group_components in ns.groups.items() %}
+    subgraph {{ group_name|replace(" ", "_") }} ["{{ group_name }}"]
+        direction TB
+        {% for component in group_components %}
+        {{ component.id }}["{{ component.name }}<br/>{{ component.description }}"]
+        {% endfor %}
+    end
+    {% endfor %}
+{% else %}
+    {% for component in components %}
+    {{ component.id }}["{{ component.name }}<br/>{{ component.description }}"]
+    {% endfor %}
+{% endif %}
+
+{% for rel in relationships %}
+    {{ rel.source_id }} -->|{{ rel.description }}| {{ rel.target_id }}
+{% endfor %}

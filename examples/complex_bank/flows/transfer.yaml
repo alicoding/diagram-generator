@@ -1,0 +1,53 @@
+flows:
+  - id: international-transfer
+    description: End-to-end flow of a user initiating a SWIFT transfer.
+    steps:
+      - source_id: customer
+        target_id: api-gateway
+        description: POST /transfer/swift
+      
+      - source_id: api-gateway
+        target_id: auth-service
+        description: Validate Token
+      
+      - source_id: api-gateway
+        target_id: payment-service
+        description: Initiate Payment
+        
+      - source_id: payment-service
+        target_id: fraud-service
+        description: Analyze Risk
+        
+      - source_id: fraud-service
+        target_id: fraud-cache
+        description: Get User Score
+        
+      - source_id: fraud-service
+        target_id: payment-service
+        description: Risk Score OK (Low)
+        is_dashed: true
+        
+      - source_id: payment-service
+        target_id: account-service
+        description: Reserve Funds
+        
+      - source_id: payment-service
+        target_id: ledger-db
+        description: Record Pending Tx
+        
+      - source_id: payment-service
+        target_id: swift-network
+        description: MT103 Message
+        
+      - source_id: payment-service
+        target_id: payment-events
+        description: Emit 'TransferSent'
+        
+      - source_id: payment-events
+        target_id: notification-service
+        description: Trigger Notification
+        is_dashed: true
+        
+      - source_id: notification-service
+        target_id: email-provider
+        description: Send Confirmation Email

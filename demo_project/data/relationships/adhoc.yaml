@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=../../schema.json
+relationships:
+  - source_id: ghost
+    target_id: shadow
+    description: Haunts
+    technology: Ectoplasm

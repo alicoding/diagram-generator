@@ -1,0 +1,22 @@
+
+# Eraser.io Parity Showcase
+# Demonstrates Groups, Properties, and implicit components
+
+group "Frontend" {
+    User [type: person, icon: user]
+    WebClient [type: web_ui, icon: monitor]
+}
+
+group "Backend" {
+    API [type: service, icon: server]
+    DB [type: database, icon: database]
+}
+
+note "User initiates login"
+
+# Connections with properties
+User -> WebClient : Click Login [color: green]
+WebClient -> API : POST /login [color: blue]
+API -> DB : SELECT * FROM users [color: red, style: dashed]
+DB -> API : Returns row
+API -> WebClient : 200 OK

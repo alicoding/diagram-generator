@@ -1,0 +1,14 @@
+{% macro render_theme(config) %}
+{% if config.theme %}
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      {% for key, value in config.theme.items() %}
+      '{{ key }}': '{{ value }}'{% if not loop.last %},{% endif %}
+      {% endfor %}
+    }
+  }
+}%%
+{% endif %}
+{% endmacro %}

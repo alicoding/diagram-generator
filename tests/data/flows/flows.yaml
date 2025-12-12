@@ -1,0 +1,16 @@
+flows:
+  - id: risk-assessment-flow
+    description: "Automatic Risk Assessment Flow"
+    tags: ["happy-path"]
+    steps:
+      - source_id: risk-service
+        target_id: risk-db
+        description: "Fetch profile history"
+        protocol: "JDBC"
+      - source_id: risk-service
+        target_id: risk-service
+        description: "Calculate Score"
+      - source_id: risk-service
+        target_id: risk-db
+        description: "Save Decision"
+        is_dashed: true

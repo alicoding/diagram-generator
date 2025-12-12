@@ -1,0 +1,31 @@
+components:
+  - id: core-db
+    name: Core DB
+    type: database
+    technology: PostgreSQL
+    description: Stores user and account data.
+    details:
+      name: Core DB Instance
+      type: CloudSQL
+      tables:
+        - name: users
+        - name: accounts
+
+  - id: ledger-db
+    name: Immutable Ledger
+    type: database
+    technology: Quantum Ledger
+    description: Stores all transaction history immutably.
+    
+  - id: fraud-cache
+    name: Fraud Cache
+    type: database
+    technology: Redis
+    description: Low latency lookups for scoring.
+    
+  - id: payment-events
+    name: payment-events-topic
+    type: container
+    technologies: 
+      - Kafka
+    description: Asynchronous payment events.

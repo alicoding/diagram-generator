@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/component.schema.json",
+  "title": "Component",
+  "description": "A software component (System, Container, or Component) in the C4 model.",
+  "type": "object",
+  "required": ["id", "name", "type", "metadata"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the component (e.g., 'auth-service').",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the component."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["system", "container", "component", "person", "external_system"],
+      "description": "The type of the component in the C4 hierarchy."
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the component's responsibility."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional arbitrary metadata (owner, tier, tech stack).",
+      "additionalProperties": true
+    },
+    "technologies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of technologies used (e.g., 'Python', 'PostgreSQL')."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags for filtering and categorization."
+    }
+  }
+}

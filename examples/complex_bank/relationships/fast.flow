@@ -1,0 +1,6 @@
+# This is a Lark-powered DSL file
+# Syntax: Source -> Target : Description
+
+dsl_user -> dsl_frontend : Clicks Button
+dsl_frontend -> dsl_backend : API Request
+dsl_backend -> dsl_database : Query

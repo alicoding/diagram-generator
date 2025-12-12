@@ -1,0 +1,11 @@
+relationships:
+  # This acts like "User -> LoadBalancer" in Eraser.io
+  # We didn't define 'internet_user' or 'load_balancer' in components/!
+  # The system will auto-create them as Generic Boxes.
+  - source_id: internet_user
+    target_id: load_balancer
+    description: "Visits Website"
+
+  - source_id: load_balancer
+    target_id: web_server
+    description: "Proxies"

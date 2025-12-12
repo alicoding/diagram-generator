@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=../../schema.json
+relationships:
+  - source_id: user
+    target_id: system
+    description: Uses
+    technology: HTTPS

@@ -1,0 +1,22 @@
+{% import 'theme.j2' as theme_macros %}
+{{ theme_macros.render_theme(config) }}
+C4Container
+  title {{ config.title }}
+
+{% for component in components %}
+  {% if component.type.value == 'container' or component.type.value == 'service' or component.type.value == 'web_ui' %}
+    Container({{ component.id }}, "{{ component.name }}", "{{ component.technologies|join(', ') }}", "{{ component.description }}")
+  {% elif component.type.value == 'database' %}
+    ContainerDb({{ component.id }}, "{{ component.name }}", "{{ component.technologies|join(', ') }}", "{{ component.description }}")
+  {% elif component.type.value == 'person' %}
+    Person({{ component.id }}, "{{ component.name }}", "{{ component.description }}")
+  {% elif component.type.value == 'system' %}
+    System({{ component.id }}, "{{ component.name }}", "{{ component.description }}")
+  {% elif component.type.value == 'external_system' %}
+    System_Ext({{ component.id }}, "{{ component.name }}", "{{ component.description }}")
+  {% endif %}
+{% endfor %}
+
+{% for rel in relationships %}
+  Rel({{ rel.source_id }}, {{ rel.target_id }}, "{{ rel.description }}", "{{ rel.protocol or '' }}")
+{% endfor %}

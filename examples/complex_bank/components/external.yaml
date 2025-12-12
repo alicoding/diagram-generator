@@ -1,0 +1,10 @@
+components:
+  - id: swift-network
+    name: SWIFT Network
+    type: external_system
+    description: International banking network for wire transfers.
+
+  - id: email-provider
+    name: SaaS Email
+    type: external_system
+    description: Third party email delivery service.

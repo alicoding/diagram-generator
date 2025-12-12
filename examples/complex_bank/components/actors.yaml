@@ -1,0 +1,10 @@
+components:
+  - id: customer
+    name: Personal Customer
+    type: person
+    description: A customer of the bank with a personal account.
+
+  - id: support-agent
+    name: Support Agent
+    type: person
+    description: Customer support representative.
