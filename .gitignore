@@ -33,7 +33,7 @@ files/
 generated/
 internal.yaml
 internal-flow.yaml
-seed-*.yaml
+seed*.yaml
 *.mmd
 ingested_components.yaml
 ingested_relationships.yaml
