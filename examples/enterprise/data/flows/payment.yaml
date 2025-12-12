@@ -1,0 +1,31 @@
+id: payment-flow-composite
+description: "Enterprise Payment Processing Flow"
+tags: ["payment", "production"]
+metadata:
+  styles:
+    gatewayClass: "fill:#E1F5FE,stroke:#0277BD,stroke-width:3px"
+    serviceClass: "fill:#F1F8E9,stroke:#558B2F,stroke-width:2px"
+    riskClass: "fill:#FFEBEE,stroke:#C62828,stroke-width:2px"
+    dbClass: "fill:#FFF3E0,stroke:#F57C00,stroke-width:2px"
+    externalClass: "fill:#ECEFF1,stroke:#455A64,stroke-width:2px,stroke-dasharray:5 5"
+
+steps:
+  - source_id: payment_gateway
+    target_id: orchestration_service
+    description: "Submit Payment"
+    
+  - source_id: orchestration_service
+    target_id: fraud_service
+    description: "Check Risk"
+
+  - source_id: fraud_service
+    target_id: orchestration_service
+    description: "Risk Score: Low"
+
+  - source_id: orchestration_service
+    target_id: ledger_db
+    description: "Record Transaction"
+
+  - source_id: orchestration_service
+    target_id: bank_rails
+    description: "Execute Transfer"

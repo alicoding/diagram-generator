@@ -2,6 +2,9 @@ import re
 from pathlib import Path
 
 import yaml
+from rich.console import Console
+
+console = Console()
 
 
 def ingest(data_dir: str = "./data", input_file: str = "internal.yaml") -> None: # noqa: PLR0912, PLR0915
@@ -68,7 +71,7 @@ def ingest(data_dir: str = "./data", input_file: str = "internal.yaml") -> None:
 
     components = []
 
-    print(f"Found {len(blocks)} blocks.")
+    console.print(f"[bold green]Found {len(blocks)} blocks.[/bold green]")
 
     for b_type, content in blocks:
         try:
@@ -85,7 +88,7 @@ def ingest(data_dir: str = "./data", input_file: str = "internal.yaml") -> None:
                             item["type"] = "component"
                         components.append(item)
                 else:
-                    print("Warning: List block parsed but wasn't a list?")
+                    console.print("[yellow]Warning: List block parsed but wasn't a list?[/yellow]")
 
             elif b_type == "map":
                 if isinstance(data, dict):
@@ -151,10 +154,10 @@ def ingest(data_dir: str = "./data", input_file: str = "internal.yaml") -> None:
 
                             components.append(component)
                 else:
-                    print("Warning: Map block parsed but wasn't a dict?")
+                    console.print("[yellow]Warning: Map block parsed but wasn't a dict?[/yellow]")
 
         except Exception as e:
-            print(f"Error parsing block ({b_type}): {e}")
+            console.print(f"[bold red]Error parsing block ({b_type}): {e}[/bold red]")
 
     # Remove duplicates (by id)
     unique_components = {}
@@ -168,7 +171,9 @@ def ingest(data_dir: str = "./data", input_file: str = "internal.yaml") -> None:
     with open(output_file, "w") as f:
         yaml.dump({"components": final_list}, f, sort_keys=False)
 
-    print(f"Successfully ingested {len(final_list)} unique components into {output_file}")
+    console.print(
+        f"[bold green]Successfully ingested {len(final_list)} unique components into {output_file}[/bold green]"
+    )
 
     # Create default view
     view_dir = Path("data_internal/views")

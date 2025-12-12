@@ -9,40 +9,23 @@ config:
 graph TB
 
 
-    %% Grouping Logic
-    {% set ns = namespace(grouped_ids=[]) %}
-    {% set groups = {} %}
-    
-    {% for comp in components %}
-        {% if comp.metadata and comp.metadata.group %}
-            {% set gname = comp.metadata.group %}
-            {% if gname not in groups %}
-                {% set _ = groups.update({gname: []}) %}
-            {% endif %}
-            {% set _ = groups[gname].append(comp) %}
-            {% set ns.grouped_ids = ns.grouped_ids + [comp.id] %}
-        {% endif %}
-    {% endfor %}
-
-    %% Render Subgraphs (Swimlanes)
-    {% for gname, comps in groups.items() %}
-    subgraph "{{ gname }}"
-        direction TB
-        {% for comp in comps %}
-        {{ comp.id }}["{{ comp.name }}<br/>{{ comp.metadata.participant_name }}"]
-        {% if comp.metadata.icon %}
-        %% Icon support could be added here if Mermaid supports it via style or html labels
-        {% endif %}
+    %% Recursive Group Rendering Macro
+    {% macro render_group(node, level=0) %}
+        {% for child_key, child_node in node.children.items() %}
+            subgraph {{ child_key }}["{{ child_node.name }}"]
+                direction TB
+                {{ render_group(child_node, level + 1) }}
+            end
         {% endfor %}
-    end
-    {% endfor %}
 
-    %% Render Ungrouped Components
-    {% for comp in components %}
-        {% if comp.id not in ns.grouped_ids %}
-        {{ comp.id }}["{{ comp.name }}"]
-        {% endif %}
-    {% endfor %}
+        {% for comp in node.node_components %}
+            {% set styleClass = comp.metadata.style if comp.metadata.style else "" %}
+            {{ comp.id }}["{{ comp.name }}<br/>{{ comp.metadata.participant_name if comp.metadata.participant_name else '' }}"]{% if styleClass %}:::{{ styleClass }}{% endif %}
+        {% endfor %}
+    {% endmacro %}
+
+    %% Render Hierarchy
+    {{ render_group(hierarchy) }}
 
     %% Render Flow Connections
     {% if flow %}
@@ -77,3 +60,8 @@ graph TB
     {% endif %}
 
     classDef note fill:#fff5ad,stroke:#d9b805,stroke-width:1px,border-style:dashed;
+    
+    %% Custom Styles
+    {% for style_name, style_def in styles.items() %}
+    classDef {{ style_name }} {{ style_def }}
+    {% endfor %}

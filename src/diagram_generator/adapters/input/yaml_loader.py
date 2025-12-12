@@ -25,12 +25,12 @@ class YAMLMetadataAdapter(MetadataPort):
         results = []
         path = self.data_path / directory
         if not path.exists():
-            print(f"DEBUG: Path does not exist: {path}")
+            # console.print(f"[dim]DEBUG: Path does not exist: {path}[/dim]")
             return []
         
-        print(f"DEBUG: Scanning {path}")
+        # console.print(f"[dim]DEBUG: Scanning {path}[/dim]")
         files = list(path.glob("*.yaml"))
-        print(f"DEBUG: Found files: {files}")
+        # console.print(f"[dim]DEBUG: Found files: {files}[/dim]")
         
         for file_path in files:
             with open(file_path) as f:
@@ -98,7 +98,7 @@ class YAMLMetadataAdapter(MetadataPort):
 
         # Merge DSL Components
         dsl_comps, _, _ = self._load_dsl()
-        print(f"DEBUG: DSL Components: {[(c.id, c.type) for c in dsl_comps]}")
+        # console.print(f"[dim]DEBUG: DSL Components: {[(c.id, c.type) for c in dsl_comps]}[/dim]")
         
         # Merge Strategy: 
         # 1. Index YAML components by ID
@@ -142,11 +142,13 @@ class YAMLMetadataAdapter(MetadataPort):
             try:
                 valid_flows.append(adapter.validate_python(item))
             except Exception as e:
-                print(f"Warning: Failed to load flow item: {e}")
+                # Use a local console or pass one if we had it, for now just use print -> console.print ideally
+                # but we didn't init console in __init__. Let's init one locally.
+                Console().print(f"[yellow]Warning: Failed to load flow item: {e}[/yellow]")
 
         # Merge DSL Flows
         _, _, dsl_flows = self._load_dsl()
-        print(f"DEBUG: YAML Flows: {[f.id for f in valid_flows]}")
-        print(f"DEBUG: DSL Flows: {[f.id for f in dsl_flows]}")
+        # Console().print(f"[dim]DEBUG: YAML Flows: {[f.id for f in valid_flows]}[/dim]")
+        # Console().print(f"[dim]DEBUG: DSL Flows: {[f.id for f in dsl_flows]}[/dim]")
         all_flows = valid_flows + dsl_flows
         return all_flows

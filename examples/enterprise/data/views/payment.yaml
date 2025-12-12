@@ -1,0 +1,5 @@
+views:
+  - key: payment-composite
+    title: "Payment Processing (Composite)"
+    type: flowchart_swimlane
+    flow_id: payment-flow-composite

@@ -7,3 +7,5 @@ temp.txt
 examples/person_onboarding/data/components/onboarding_components.yaml
 dist/
 examples/person_onboarding/
+dist_enterprise/
+__pycache__/

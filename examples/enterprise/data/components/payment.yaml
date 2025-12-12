@@ -1,0 +1,35 @@
+components:
+  - id: payment_gateway
+    name: "Payment Gateway"
+    type: system
+    metadata:
+      group: "Gateway Layer"
+      style: gatewayClass
+
+  - id: orchestration_service
+    name: "Payment Orchestrator"
+    type: service
+    metadata:
+      group: "Core Processing.Orchestration"
+      style: serviceClass
+
+  - id: fraud_service
+    name: "Fraud Check API"
+    type: service
+    metadata:
+      group: "Core Processing.Risk"
+      style: riskClass
+
+  - id: ledger_db
+    name: "Transaction Ledger"
+    type: database
+    metadata:
+      group: "Core Processing.Data"
+      style: dbClass
+      
+  - id: bank_rails
+    name: "Banking Network"
+    type: external_system
+    metadata:
+      group: "External Networks"
+      style: externalClass
