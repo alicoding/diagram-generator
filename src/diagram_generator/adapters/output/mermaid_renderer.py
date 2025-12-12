@@ -69,7 +69,7 @@ class MermaidDiagramAdapter(DiagramPort):
             
             # Split by dot or some separator, currently assuming "Parent.Child"
             parts = group_path.split("__SEPARATOR__") 
-            # Note: User request implied "I&O Layer.PSOS" so let's try dot, 
+            # Note: User request implied "Infrastructure Layer.PSOS" so let's try dot, 
             # but usually dot is dangerous in IDs. Let's support explicit dot.
             # If no dot, it's just one group.
             parts = group_path.split('.')

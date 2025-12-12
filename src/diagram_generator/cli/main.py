@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import typer
+import yaml
 from rich.console import Console
 
 from diagram_generator.adapters.input.yaml_loader import YAMLMetadataAdapter
@@ -106,6 +107,48 @@ def generate_all(
         console.print(f"[red]Fatal Error: {e}[/red]")
         raise typer.Exit(code=1) from None
 
+
+
+@app.command()
+def ingest(
+    config: str = typer.Option("ingestion_config.yaml", help="Path to ingestion config"),
+    output_dir: str = typer.Option("examples/enterprise/data/components", help="Output directory for components")
+) -> None:
+    """Ingest seed data into SSOT."""
+    from diagram_generator.core.services.seed_ingester import SeedIngester  # noqa: PLC0415
+    
+    ingester = SeedIngester(config, ".")
+    results = ingester.ingest()
+    
+    # Save Components
+    if results["components"]:
+        output_path = Path(output_dir) / "ingested_components.yaml"
+        console.print(f"Saving {len(results['components'])} components to {output_path}")
+        
+        # Serialize
+        components_data = [c.model_dump(exclude_none=True, mode='json') for c in results["components"]]
+        with open(output_path, 'w') as f:
+            yaml.dump({"components": components_data}, f)
+            
+    # Save Flows
+    if results["flows"]:
+        flow_output_path = Path(output_dir) / "ingested_flows.yaml"
+        console.print(f"Saving {len(results['flows'])} flows to {flow_output_path}")
+        
+        flows_data = [f.model_dump(exclude_none=True, mode='json') for f in results["flows"]]
+        with open(flow_output_path, 'w') as f:
+            yaml.dump({"flows": flows_data}, f)
+            
+    # Save Relationships
+    if results.get("relationships"):
+        rel_output_path = Path(output_dir) / "ingested_relationships.yaml"
+        console.print(f"Saving {len(results['relationships'])} relationships to {rel_output_path}")
+        
+        rels_data = [r.model_dump(exclude_none=True, mode='json') for r in results["relationships"]]
+        with open(rel_output_path, 'w') as f:
+            yaml.dump({"relationships": rels_data}, f)
+    
+    console.print("Ingestion complete.")
 
 if __name__ == "__main__":
     app()

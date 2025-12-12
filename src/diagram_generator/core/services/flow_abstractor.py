@@ -1,9 +1,12 @@
+from diagram_generator.core.domain.component import Component, Container, System
 from diagram_generator.core.domain.flow import Flow, FlowStep
-from diagram_generator.core.domain.component import Component, GenericComponent, ComponentType
 from diagram_generator.core.services.component_hierarchy import ComponentHierarchy
 
+
 class FlowAbstractor:
-    def abstract_flows(self, flows: list[Flow], components: list[Component], level: str) -> tuple[list[Flow], list[Component]]:
+    def abstract_flows(
+        self, flows: list[Flow], components: list[Component], level: str
+    ) -> tuple[list[Flow], list[Component]]:
         if level not in ['system', 'container']:
             return flows, components
             
@@ -17,8 +20,12 @@ class FlowAbstractor:
             
             for step in flow.steps:
                 # 1. Resolve Parents
-                src_parent_id = hierarchy.get_parent_id(step.source_id, level)
-                tgt_parent_id = hierarchy.get_parent_id(step.target_id, level)
+                src_parent_name = hierarchy.get_parent_id(step.source_id, level)
+                tgt_parent_name = hierarchy.get_parent_id(step.target_id, level)
+                
+                # Sanitize IDs for internal use/linking
+                src_parent_id = self._sanitize_id(src_parent_name)
+                tgt_parent_id = self._sanitize_id(tgt_parent_name)
                 
                 # 2. Skip internal steps (same parent interaction)
                 if src_parent_id == tgt_parent_id:
@@ -27,9 +34,13 @@ class FlowAbstractor:
                 # 3. Create Abstract Step
                 # We need to register these parents as components if they don't exist
                 if src_parent_id not in abstract_components_map:
-                   abstract_components_map[src_parent_id] = self._create_synthetic_component(src_parent_id, level)
+                   abstract_components_map[src_parent_id] = self._create_synthetic_component(
+                       src_parent_id, src_parent_name, level
+                   )
                 if tgt_parent_id not in abstract_components_map:
-                   abstract_components_map[tgt_parent_id] = self._create_synthetic_component(tgt_parent_id, level)
+                   abstract_components_map[tgt_parent_id] = self._create_synthetic_component(
+                       tgt_parent_id, tgt_parent_name, level
+                   )
 
                 new_step = FlowStep(
                     source_id=src_parent_id,
@@ -39,7 +50,11 @@ class FlowAbstractor:
                 )
                 
                 # 4. Deduplicate (if same as last step)
-                if last_step and last_step.source_id == new_step.source_id and last_step.target_id == new_step.target_id:
+                if (
+                    last_step and 
+                    last_step.source_id == new_step.source_id and 
+                    last_step.target_id == new_step.target_id
+                ):
                     # Append description?
                     continue
                     
@@ -61,7 +76,13 @@ class FlowAbstractor:
         # Let's return just the abstract components that are used.
         return abstract_flows, list(abstract_components_map.values())
         
-    def _create_synthetic_component(self, id: str, level: str) -> Component:
+    def _sanitize_id(self, raw: str) -> str:
+        import re  # noqa: PLC0415
+        # Convert "System A" -> "System_A", "Mgmt Layer" -> "Mgmt_Layer"
+        s = str(raw).strip().replace(" ", "_").replace("&", "_and_")
+        return re.sub(r'[^a-zA-Z0-9_\-]', '', s)
+
+    def _create_synthetic_component(self, id: str, name: str, level: str) -> Component:
         # Sanitize ID for validation (alphanumeric only)
         # But we need to use the original ID for linking?
         # The Hierarchy resolver returns names as IDs (e.g. "Payment Platform").
@@ -70,12 +91,11 @@ class FlowAbstractor:
         # Actually base component is strict on ID (pattern).
         # We need to ensure the ID returned by `get_parent_id` is clean.
         
-        from diagram_generator.core.domain.component import System, Container
         
         # If ID has spaces, we can't do much if BaseComponent forbids it.
         # We should probably update ComponentHierarchy to slugify IDs.
         
         if level == 'system':
-            return System(id=id, name=id, description="Abstracted System")
+            return System(id=id, name=name, description="Abstracted System")
         else:
-            return Container(id=id, name=id, description="Abstracted Container")
+            return Container(id=id, name=name, description="Abstracted Container")

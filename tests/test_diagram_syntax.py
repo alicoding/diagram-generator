@@ -1,8 +1,8 @@
-from typing import Any
-import re
-from diagram_generator.core.use_cases.generate_diagram import GenerateDiagramUseCase
-from diagram_generator.adapters.output.mermaid_renderer import MermaidDiagramAdapter
+
 from diagram_generator.adapters.input.yaml_loader import YAMLMetadataAdapter
+from diagram_generator.adapters.output.mermaid_renderer import MermaidDiagramAdapter
+from diagram_generator.core.use_cases.generate_diagram import GenerateDiagramUseCase
+
 
 class TestDiagramSyntax:
     def test_generated_diagrams_syntax(self) -> None:
@@ -53,7 +53,8 @@ class TestDiagramSyntax:
                 if "-->" not in stripped and "-.-" not in stripped and "==>" not in stripped and "&" not in stripped:
                     # Likely missing newline: A["..."] B["..."]
                     raise AssertionError(
-                        f"View '{view_key}': Line {i+1} appears to have multiple node definitions without separators.\nLine: {stripped}"
+                        f"View '{view_key}': Line {i+1} has multiple node definitions without separators.\n"
+                        f"Line: {stripped}"
                     )
 
             # Check balanced brackets (basic)

@@ -1,5 +1,5 @@
-from typing import Any
 from diagram_generator.core.domain.component import Component
+
 
 class ComponentHierarchy:
     """Resolves abstraction parents for components based on metadata."""
@@ -29,8 +29,9 @@ class ComponentHierarchy:
             return parts[0]
             
         if level == "container":
-            if len(parts) >= 2:
-                return f"{parts[0]}.{parts[1]}"
+            if len(parts) >= 2: # noqa: PLR2004
+                # Replace dot with underscore for valid ID
+                return f"{parts[0]}_{parts[1]}"
             return parts[0] # Fallback to root
             
         return component_id

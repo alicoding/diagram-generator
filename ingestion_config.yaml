@@ -1,0 +1,111 @@
+sources:
+  - file: seed.yaml
+    format: yaml
+
+# Using glom's declarative syntax logic
+# We define a list of mapping specs
+mappings:
+  components:
+    # 1. System Level (Root Context)
+    - source_path: "system_context.components"
+      item_model: "System"
+      spec:
+        id: "id"
+        name: "name"
+        description: "description"
+        metadata:
+          platform: "platform"
+          vendor: "vendor"
+          api_gateway: "api_gateway"
+
+    # 2. Infrastructure Service Types (Groups)
+    - source_path: "infrastructure_service_types"
+      item_model: "System"
+      spec:
+        id: "id"
+        name: "name"
+        description: "description"
+        metadata:
+          deployment: "deployment"
+
+    # 3. Capabilities (The Services)
+    - source_path: "capabilities"
+      item_model: "Service"
+      spec:
+        id: "id"
+        name: "name"
+        description: "description"
+        metadata:
+          domain: "domain"
+          group: "domain" # Map Domain to Group
+          tier: "tier"
+          layer: "layer"
+          vendor: "vendor"
+          # Example of deep nesting cleanup using Coalesce if needed
+        
+    # 3b. Secondary Capabilities (Merged)
+    - source_path: "capabilities_secondary"
+      item_model: "Service"
+      spec:
+        id: "id"
+        name: "name"
+        description: "description"
+        metadata:
+          domain: "domain"
+          group: "domain"
+          tier: "tier"
+          layer: "layer"
+          vendor: "vendor"
+        
+    # 4. Databases
+    - source_path: "data_architecture.technical_capability_dbs.databases_list"
+      item_model: "Database"
+      spec:
+        id: "db_instance"
+        name: "db_instance"
+        description: "purpose"
+        type: "T.db_type" # Example of capturing raw value for logic later
+        technology: "db_type"
+        metadata:
+          schema: "db_schema"
+          owner: "data_ownership.owner_domain"
+          group: "data_ownership.owner_domain" # Map Owner to Group
+
+
+  flows:
+    - source_path: "hld_flows"
+      item_model: "Flow"
+      spec:
+        id: "id"
+        description: "name"
+        metadata:
+          status: "status"
+          vendor: "vendor"
+          direction: "api.direction"
+
+  relationships:
+    - source_path: "capabilities"
+      spec:
+        source_id: "id"
+        targets: "depends_on" # List of target IDs
+        type: "dependency"
+
+    # Infer Database dependencies from data_architecture
+    - source_path: "data_architecture.technical_capability_dbs.databases_list"
+      spec:
+        source_id: "service" # e.g., "Service Name"
+        targets: "db_instance" # e.g., "db-cluster-01"
+        type: "data_access"
+        
+    # Infer Infrastructure Layer dependencies
+    - source_path: "infrastructure_service_types"
+      spec:
+        source_id: "id"
+        targets: "deployment"
+        type: "hosting"
+
+    # Infer Relationships from Flows (Flow Steps imply Dependencies)
+    - source_path: "hld_flows"
+      spec:
+        direction: "api.direction" # e.g. "App -> Middleware -> Vendor"
+        type: "flow_step"
