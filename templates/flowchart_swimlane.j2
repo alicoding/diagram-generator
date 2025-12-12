@@ -57,11 +57,16 @@ graph TB
                     {{ step.source_id }} -.- {{ step.metadata.position }}
                 {% endif %}
             {% else %}
-                {{ step.source_id }} {{ "-->" if step.is_dashed else "-->" }} {{ step.target_id }}
-                {% if step.description %}
-                {{ step.source_id }} -- "{{ step.description }}" --> {{ step.target_id }}
+                {% if step.is_dashed %}
+                    {% set arrow = "-.->" %}
                 {% else %}
-                {{ step.source_id }} --> {{ step.target_id }}
+                    {% set arrow = "-->" %}
+                {% endif %}
+
+                {% if step.description %}
+                    {{ step.source_id }} {{ arrow }}|{{ step.description }}| {{ step.target_id }}
+                {% else %}
+                    {{ step.source_id }} {{ arrow }} {{ step.target_id }}
                 {% endif %}
             {% endif %}
         {% endfor %}

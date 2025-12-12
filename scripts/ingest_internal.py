@@ -116,6 +116,8 @@ def ingest(data_dir: str = "./data", input_file: str = "internal.yaml") -> None:
                                 comp_type = "service"  # Fix for Pydantic validation
                             if comp_type == "api":
                                 comp_type = "service"  # Fix for API type
+                            if comp_type == "integration":
+                                comp_type = "service" # Fix for Integration type
                             if comp_type == "ui":
                                 comp_type = "web_ui"  # Fix for UI type
 

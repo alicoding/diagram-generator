@@ -141,8 +141,8 @@ class YAMLMetadataAdapter(MetadataPort):
         for item in data:
             try:
                 valid_flows.append(adapter.validate_python(item))
-            except Exception:
-                pass # Already handled logging elsewhere or simple skip
+            except Exception as e:
+                print(f"Warning: Failed to load flow item: {e}")
 
         # Merge DSL Flows
         _, _, dsl_flows = self._load_dsl()
